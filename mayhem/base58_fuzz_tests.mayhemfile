@@ -1,0 +1,4 @@
+project: PROJECT
+target: base58_fuzz_tests
+cmds:
+- cmd: /out/base58_fuzz_tests
