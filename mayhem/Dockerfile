@@ -18,6 +18,7 @@
 
 # builder stage
 FROM gcr.io/oss-fuzz-base/base-builder
+RUN sed -i s/snapshot.ubuntu.com/archive.ubuntu.com/g /etc/apt/sources.list 2>/dev/null || true
 
 RUN set -ex && apt-get update && apt-get --no-install-recommends --yes install ca-certificates cmake g++ make pkg-config graphviz doxygen git curl libtool libtool-bin flex bison autoconf automake bzip2 xsltproc gperf unzip cmake ccache libsodium-dev libreadline-dev libudev-dev libprotobuf-dev protobuf-compiler libexpat-dev
 
@@ -30,7 +31,7 @@ ENV CXXFLAGS="${CXXFLAGS} -fPIC -pthread"
 ARG BOOST_VERSION=1_70_0
 ARG BOOST_VERSION_DOT=1.70.0
 ARG BOOST_HASH=430ae8354789de4fd19ee52f3b1f739e1fba576f0aded0897c3c2bc00fb38778
-RUN set -ex && curl -s -L -o boost_${BOOST_VERSION}.tar.bz2 https://downloads.getmonero.org/libs/boost_${BOOST_VERSION}.tar.bz2 && echo "${BOOST_HASH} boost_${BOOST_VERSION}.tar.bz2" | sha256sum -c && tar -xjf boost_${BOOST_VERSION}.tar.bz2 && cd boost_${BOOST_VERSION} && sed -i -e 's/use(* m_instance)/if (m_instance) use(* m_instance)/' boost/serialization/singleton.hpp && ./bootstrap.sh --with-toolset=clang && ./b2 --build-type=minimal link=static runtime-link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="$CFLAGS" cxxflags="$CXXFLAGS" stage
+RUN set -ex && curl -s -L -o boost_${BOOST_VERSION}.tar.bz2 https://archives.boost.io/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 && echo "${BOOST_HASH} boost_${BOOST_VERSION}.tar.bz2" | sha256sum -c && tar -xjf boost_${BOOST_VERSION}.tar.bz2 && cd boost_${BOOST_VERSION} && sed -i -e 's/use(* m_instance)/if (m_instance) use(* m_instance)/' boost/serialization/singleton.hpp && ./bootstrap.sh --with-toolset=clang && ./b2 --build-type=minimal link=static runtime-link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="$CFLAGS" cxxflags="$CXXFLAGS" stage
 ENV BOOST_ROOT /usr/local/boost_${BOOST_VERSION}
 
 # OpenSSL
